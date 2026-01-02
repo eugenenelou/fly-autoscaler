@@ -221,6 +221,7 @@ func NewConfigFromEnv() (_ *Config, err error) {
 			MetricName: os.Getenv("FAS_TEMPORAL_METRIC_NAME"),
 			CertData:   certData,
 			KeyData:    keyData,
+			APIKey:     os.Getenv("FAS_TEMPORAL_API_KEY"),
 			Query:      os.Getenv("FAS_TEMPORAL_QUERY"),
 		})
 	}
@@ -396,6 +397,7 @@ type MetricCollectorConfig struct {
 	Namespace string `yaml:"namespace"`
 	CertData  string `yaml:"cert-data"`
 	KeyData   string `yaml:"key-data"`
+	APIKey    string `yaml:"api-key"`
 }
 
 func (c *MetricCollectorConfig) Validate() error {
@@ -426,6 +428,9 @@ func (c *MetricCollectorConfig) validatePrometheus() error {
 }
 
 func (c *MetricCollectorConfig) validateTemporal() error {
+	if c.APIKey != "" && (c.CertData != "" || c.KeyData != "") {
+		return fmt.Errorf("cannot specify both api-key and cert-data/key-data for temporal")
+	}
 	return nil
 }
 
@@ -456,6 +461,7 @@ func (c *MetricCollectorConfig) newTemporalMetricCollector() (*temporal.MetricCo
 	collector.Namespace = c.Namespace
 	collector.Cert = []byte(c.CertData)
 	collector.Key = []byte(c.KeyData)
+	collector.APIKey = c.APIKey
 	collector.Query = c.Query
 
 	if err := collector.Open(); err != nil {

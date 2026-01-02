@@ -57,6 +57,9 @@ metric-collectors:
   - type: "temporal"
     metric-name: "workflow_count"
     address: "localhost:7233"
+    namespace: "default"
+    # Use either api-key (for Temporal Cloud) or cert-data/key-data (for mTLS)
     cert-data: "-----BEGIN CERTIFICATE-----..."
     key-data: "-----BEGIN EC PRIVATE KEY-----..."
+    # api-key: "your-api-key"
     query: 'WorkflowType="my_workflow_type"'
