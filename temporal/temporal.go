@@ -26,6 +26,9 @@ type MetricCollector struct {
 	Cert []byte
 	Key  []byte
 
+	// API Key for Temporal Cloud authentication. Optional. Must be set before calling Open().
+	APIKey string
+
 	// Query string used to filter running workflows.
 	Query string
 }
@@ -47,7 +50,13 @@ func (c *MetricCollector) Open() (err error) {
 		Namespace: c.Namespace,
 	}
 
-	if len(c.Cert) != 0 || len(c.Key) != 0 {
+	if c.APIKey != "" {
+		opt.Credentials = client.NewAPIKeyStaticCredentials(c.APIKey)
+		// Enable TLS for Temporal Cloud connections (use system root CAs)
+		opt.ConnectionOptions.TLS = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
+	} else if len(c.Cert) != 0 || len(c.Key) != 0 {
 		cert, err := tls.X509KeyPair(c.Cert, c.Key)
 		if err != nil {
 			return err
