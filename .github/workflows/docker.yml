@@ -36,7 +36,7 @@ jobs:
       - id: meta
         uses: docker/metadata-action@v5
         with:
-          images: flyio/fly-autoscaler
+          images: eugeneneloupiston/fly-autoscaler
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -44,6 +44,7 @@ jobs:
             type=sha,format=long
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - uses: docker/build-push-action@v5
         with:
