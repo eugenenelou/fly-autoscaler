@@ -159,16 +159,16 @@ func (r *Reconciler) Reconcile(ctx context.Context) error {
 	)
 
 	// Determine if we need to create or destroy machines.
-	createdN := len(machines)
+	createdN := len(filtered)
 	if hasMinCreatedN && createdN < minCreatedN {
-		if len(machines) == 0 {
+		if len(filtered) == 0 {
 			return fmt.Errorf("no machine available to clone for scale up")
 		}
 
-		machine := machines[0]
+		machine := filtered[0]
 		config := machine.Config
 		config.Image = machine.FullImageRef()
-		return r.createN(ctx, machines[0].Config, machine.Region, minCreatedN-createdN)
+		return r.createN(ctx, filtered[0].Config, machine.Region, minCreatedN-createdN)
 	}
 	if hasMaxCreatedN && createdN > maxCreatedN {
 		return r.destroyN(ctx, m, createdN-maxCreatedN)
